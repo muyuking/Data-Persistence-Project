@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -18,12 +19,27 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    public int maxPoints;
+    public Text BestScoreText;
+
+    public static MainManager Instance;
+    public GameObject inputField;
+    public string userName;
+
+
     // Start is called before the first frame update
     void Start()
     {
+        //Added: To load maxPoints from saved ScenesData
+        maxPoints = ScenesData.Instance.LoadPlayerData();
+        //Debug.Log("MainManager.maxPoints: " + ScenesData.Instance.LoadPlayerData());
+
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
+
+        //Added: To load username from ScenesData
+        userName = ScenesData.Instance.userName;
         
         int[] pointCountArray = new [] {1,1,2,2,5,5};
         for (int i = 0; i < LineCount; ++i)
@@ -66,11 +82,31 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        //Added: To display userName and maxPoints on top of the screen
+        BestScoreText.text = $"The Best Score: {userName} : {maxPoints}";
     }
 
     public void GameOver()
     {
+        //Added: To set maxPoints to ScenesData
+        ScenesData.Instance.maxPoints = MaxPoints();
+        //Added: To save data to ScenesData
+        ScenesData.Instance.SavePlayerData();
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
+
+    //Added: To update the maxPoints
+    public int MaxPoints()
+    {
+        if (m_Points > maxPoints)
+        {
+            maxPoints = m_Points;
+        }
+        return maxPoints;
+    }
+
+
 }
